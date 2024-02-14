@@ -9,7 +9,7 @@
 // GUItool: begin automatically generated codeyd
 MyDsp myDsp;
 AudioControlSGTL5000     audioShield;
-
+AudioSynthWaveformSine   sine2;
 // GUItool: begin automatically generated code
 AudioSynthNoiseWhite     noise;         //xy=74.66666793823242,354.9999942779541
 AudioInputI2S            in;           //xy=79,788
@@ -57,7 +57,7 @@ AudioMixer4              mixer10; //xy=672.2221603393555,285.5555419921875
 AudioMixer4              mixer11; //xy=677.7777976989746,478.8888740539551
 AudioMixer4              mixer12; //xy=834.4444351196289,359.9999771118164
 AudioOutputI2S           out;           //xy=986.6666666666666,355.55555555555554
-AudioConnection          patchCord1(noise, biquad1);
+AudioConnection          patchCord1(sine2, biquad1);
 AudioConnection          patchCord2(noise, biquad2);
 AudioConnection          patchCord3(noise, biquad3);
 AudioConnection          patchCord4(noise, biquad4);
@@ -132,112 +132,120 @@ AudioConnection          patchCord72(mixer10, 0, mixer12, 0);
 AudioConnection          patchCord73(mixer11, 0, mixer12, 1);
 AudioConnection          patchCord74(mixer12, 0, out, 0);
 AudioConnection          patchCord75(mixer12, 0, out, 1);
+
+
 // GUItool: end automatically generated code
 
 AudioSynthWaveform waveform1;
 AudioConnection patchCord310(waveform1, 0, mixer1, 2);
 
 //Listes des mixers, des gains et des filtres
-AudioMixer4 mixers[]= {mixer2,mixer3, mixer4,mixer5, mixer6, mixer7, mixer8, mixer9};
-float gains[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-AudioFilterBiquad  filtres[] = {biquad1, biquad2, biquad3,biquad4,biquad5,biquad6,biquad7,biquad8,biquad9,biquad10,biquad11,
-biquad12,biquad13,biquad14,biquad15,biquad16,biquad17,biquad18,biquad19,biquad20,biquad21,biquad22,biquad23,biquad24,biquad25,biquad26,
-biquad27, biquad28, biquad29, biquad30};
+AudioMixer4 *mixers[] = {&mixer2, &mixer3, &mixer4, &mixer5, &mixer6, &mixer7, &mixer8, &mixer9};
+float gains[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+AudioFilterBiquad*  filtres [] = {&biquad1, &biquad2, &biquad3, &biquad4, &biquad5, &biquad6, &biquad7, &biquad8, &biquad9, &biquad10, &biquad11,
+                                  &biquad12, &biquad13, &biquad14, &biquad15, &biquad16, &biquad17, &biquad18, &biquad19, &biquad20, &biquad21, &biquad22, &biquad23, &biquad24, &biquad25, &biquad26,
+                                  &biquad27, &biquad28, &biquad29, &biquad30
+                                 };
 
 
 void setup() {
   Serial.begin(9600);
-  AudioMemory(10);
+  AudioMemory(200);
   audioShield.enable();
-  audioShield.volume(1);
-  noise.amplitude(1);
-  waveform1.begin(1.0, 1000, WAVEFORM_SINE);
+  audioShield.volume(0.5);
+  noise.amplitude(0.3);
+  waveform1.begin(0.5, 440, WAVEFORM_SINE);
   audioShield.inputSelect(AUDIO_INPUT_MIC);
   audioShield.micGain(15);
 
   //Configuration des gains des mixers
   mixer1.gain(0, 0.5);
-  mixer1.gain(1,0.5);
+  mixer1.gain(1, 0.5);
   mixer1.gain(2, 0.5);
   mixer1.gain(3, 0.0);
 
   mixer10.gain(0, 0.25);
-  mixer10.gain(1,0.25);
+  mixer10.gain(1, 0.25);
   mixer10.gain(2, 0.25);
   mixer10.gain(3, 0.25);
 
   mixer11.gain(0, 0.25);
-  mixer11.gain(1,0.25);
+  mixer11.gain(1, 0.25);
   mixer11.gain(2, 0.25);
   mixer11.gain(3, 0.25);
 
   mixer12.gain(0, 0.5);
-  mixer12.gain(1,0.5);
+  mixer12.gain(1, 0.5);
   mixer12.gain(2, 0);
   mixer12.gain(3, 0);
 
   setMixerGain(mixers);
 
-  //configuration des filtres 
+  //configuration des filtres
   setFiltres(filtres);
-  
+
   // Uncomment one these to try other window functions
   //fft1024_1.windowFunction(NULL);
   // fft1024_1.windowFunction(AudioWindowBartlett1024);
   // fft1024_1.windowFunction(AudioWindowFlattop1024);
+  sine2.amplitude(1);
+  sine2.frequency(440);
   delay(1000);
 
 }
-void setMixerGain(AudioMixer4 mixers[]){
-  Serial.print("je set les mixers");
-  for(int i=0; i<32; i = i+4){
-    AudioMixer4 mixer = mixers[i];
-    mixer.gain(0, gains[i]);
-    mixer.gain(1,gains[i+1]);
-    mixer.gain(2, gains[i+2]);
-    mixer.gain(3, gains[i+3]);
+void setMixerGain(AudioMixer4 *mixers[]) {
+  Serial.print("Je set les gains\n");
+  for (int i = 0; i < 32; i = i + 4) {
+    AudioMixer4* mixer = mixers[i];
+    if (mixer != NULL) {
+      mixer->gain(0, gains[i]);
+      Serial.print("Je set le premier in\n");
+      mixer->gain(1, gains[i + 1]);
+      mixer->gain(2, gains[i + 2]);
+      mixer->gain(3, gains[i + 3]);
+    }
   }
-  //Serial.print("j'ai set les mixers");
+  Serial.print("j'ai set les mixers");
 }
 
-void setFiltres(AudioFilterBiquad  filtres[]){
-  float freq = 12.5;
-  for(int i=0; i<30; i++){
-    AudioFilterBiquad  filtre = filtres[i];
-    filtre.setBandpass(0, freq, 5);
-    freq = freq +25;
+void setFiltres(AudioFilterBiquad  *filtres[]) {
+  float freq = 38;
+  for (int i = 0; i < 30; i++) {
+    AudioFilterBiquad * filtre = filtres[i];
+    filtre->setBandpass(0, freq, 5);
+    freq = freq + 25;
   }
 }
 
 
 void loop() {
+  //biquad1.setBandpass(0,440,130);
   // print Fourier Transform data to the Arduino Serial Monitor
-  Serial.print("ici");
   if (fft1024_1.available()) {
     Serial.print("FFT: ");
-    for (int i=0; i<30; i++) {  // 0-25  -->  DC to 1.25 kHz
+    for (int i = 0; i < 30; i++) { // 0-25  -->  DC to 1.25 kHz
       float n = fft1024_1.read(i);
-      setGain(n,i);
+      setGain(n, i);
     }
     Serial.print("gain:");
     Serial.println(gains[0]);
     Serial.println(gains[15]);
-    //setMixerGain(mixers);
+    setMixerGain(mixers);
     Serial.println();
-    
+    mixer2.gain(0, 0.75);
   }
 }
 
 
 void setGain(float n, int i) {
-  if (n >= 0.005) {
-    gains[i]= n*10;
+  if (n >= 0.5) {
+    gains[i] = n * 10;
     Serial.print(n, 3);
     Serial.print(" ");
-    
+
   } else {
     gains[i] = 0;
     Serial.print("   -  "); // don't print "0.00"
   }
-  
+
 }
