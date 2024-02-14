@@ -6,10 +6,12 @@
 #include <SerialFlash.h>
 #include "MyDsp.h"
 
+
 // GUItool: begin automatically generated codeyd
 MyDsp myDsp;
 AudioControlSGTL5000     audioShield;
-
+unsigned long previousMillis = 0;
+const long interval = 50; // Interval in milliseconds
 
 
 // GUItool: begin automatically generated code
@@ -45,6 +47,7 @@ float gains []= {3,3,3};
 
 void setup() {
   Serial.begin(9600);
+
   AudioMemory(10);
   audioShield.enable();
   audioShield.volume(0.5);
@@ -75,20 +78,24 @@ void setup() {
 
 void loop() {
   // print Fourier Transform data to the Arduino Serial Monitor
-  if (fft1024_1.available()) {
-    Serial.print("FFT: ");
-    for (int i=0; i<3; i++) {  // 0-25  -->  DC to 1.25 kHz
-      float n = fft1024_1.read(i);
-      
-      setGain(n,i);
-    }
-    Serial.print("gain:");
-    Serial.println(gains[0]);
-    mixer2.gain(0, gains[0]);
-    mixer2.gain(1, gains[1]);
-    mixer2.gain(2, gains[2]);
-    Serial.println();
-    
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= interval) {
+   
+    previousMillis = currentMillis;
+    if (fft1024_1.available()) {
+      Serial.print("FFT: ");
+      for (int i=0; i<3; i++) {  // 0-25  -->  DC to 1.25 kHz
+        float n = fft1024_1.read(i);
+        
+        setGain(n,i);
+      }
+      Serial.print("gain:");
+      Serial.println(gains[0]);
+      mixer2.gain(0, gains[0]);
+      mixer2.gain(1, gains[1]);
+      mixer2.gain(2, gains[2]);
+      Serial.println();
+    }   
   }
 
 
@@ -105,7 +112,7 @@ void setGain(float n, int i) {
     //trouver une relation entre n et le gain appliqué auy filtre
     //noise.filtre(gain, frequence, qualité)
     // il faut superposer tous les noise filtrés
-    gains[i]= n;
+    gains[i]= n*100;
     Serial.print(n, 3);
     Serial.print(" ");
     
