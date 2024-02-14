@@ -29,7 +29,7 @@ void MyDsp::update(void) {
       for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
         float currentSample = 0; 
         if(inBlock[channel]){
-          currentSample = inBlock[channel]->data[i]*DIV_16*0.5;
+          currentSample = inBlock[channel]->data[i]*DIV_16*0.7;
         }
         currentSample = max(-1,min(1,currentSample));
         int16_t val = currentSample*MULT_16;
