@@ -55,7 +55,7 @@ filtres{&filtre1, &filtre2, &filtre3, &filtre4, &filtre5, &filtre6, &filtre7, &f
 MyDsp::~MyDsp(){}
 
 void MyDsp::setGains(float newGains[30]){
-   for (int i = 0; i < 30; ++i) {
+   for (int i = 0; i < 15; ++i) {
         gains[i] = newGains[i];
     }
 }
@@ -67,17 +67,18 @@ void MyDsp::update(void) {
     outBlock[channel] = allocate();
     if (outBlock[channel]) {
       for (int i = 0; i < AUDIO_BLOCK_SAMPLES; i++) {
-        float currentSample = noise.tick()*0.5;
-        for( int j = 0; j< 30; j++) {
-          Filtre* filtreTemp = filtres[j];
-          currentSample = filtreTemp->peak_eq(gains[j], freq[j], 40, currentSample);
+        float currentSample = 0.0;
+        float noise1 = noise.tick()*0.5;
+        for( int j = 0; j< 15; j++) {
+          currentSample = currentSample + (*filtres[j]).resonbp(freq[j],50,gains[j], noise1);
         }
         currentSample = max(-1,min(1,currentSample));
         int16_t val = currentSample*MULT_16;
         outBlock[channel]->data[i] = val;
-      }
+      
       transmit(outBlock[channel], channel);
       release(outBlock[channel]);
     }
+  }
   }
 }
