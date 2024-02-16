@@ -12,24 +12,26 @@ AudioSynthWaveform sine;
 AudioAnalyzeFFT1024 fft1024;
 AudioConnection patchCord0(myDsp,0,out,0);
 AudioConnection patchCord1(myDsp,0,out,1);
-AudioConnection patchCord2(in, 0, mixer1, 0);
-AudioConnection patchCord3(in, 1, mixer1, 1);
+AudioConnection patchCord2(sine, 0, mixer1, 0);
+AudioConnection patchCord3(sine, 1, mixer1, 1);
 AudioConnection patchCord4(mixer1, fft1024);
 //AudioConnection patchCord5(mixer1, out);
-float newGains []= {8,0,0,0,0,0,0,0,5,0,0,0,0,0,3,0,0,0,0,0,0,0,0,7,0,0,0,0,0,0,};
+float newGains []= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
 
 void setup() {
   Serial.begin(9600);
- 
-  Serial.print("cojfjh");
+  Serial.print("coucou");
   AudioMemory(10);
+  Serial.print("jai alloué ta mémoire");
   audioShield.enable();
+  Serial.print("AudioShield enable");
   audioShield.volume(0.5);
+  Serial.print("edehzfozoh");
   audioShield.inputSelect(AUDIO_INPUT_MIC);
   audioShield.micGain(15);
   myDsp.setGains(newGains);
  
-  sine.begin(0.5,420,WAVEFORM_SAWTOOTH);
+  sine.begin(0.5,440,WAVEFORM_SAWTOOTH);
 
   mixer1.gain(0,0.5);
   mixer1.gain(1,0.5);
@@ -37,15 +39,17 @@ void setup() {
   mixer1.gain(3,0);
 
   fft1024.windowFunction(NULL);
-  Serial.print("J'attends\n");
+  
   delay(100);
+
 }
 
 void loop() {
   Serial.print("Je loupe\n");
   //Serial.print(newGains[0]);
+  /*
  
-  /*if (fft1024.available()) {
+  if (fft1024.available()) {
     //Serial.print("FFT: ");
     for (int i=0; i<30; i++) {  // 0-25  -->  DC to 1.25 kHz
       float n = fft1024.read(i)*10;
@@ -54,11 +58,20 @@ void loop() {
     //Serial.print("\n");
     myDsp.setGains(newGains);
    }
-  */
-    myDsp.setGains(newGains);
-    delay(1000);
+    Serial.print(newGains[10]);
+    Serial.print(newGains[5]);
+    Serial.print(newGains[15]);
+    Serial.print("\n");
+    */
+    delay(100);
 }
 
+void afficher(){
+  Serial.print("je suis là");
+  for(int i=0; i<15; i++){
+    Serial.print(newGains[i]);
+  }
+}
 
 void fftRead(float n, int i) {
   if (n >= 0.00) {
