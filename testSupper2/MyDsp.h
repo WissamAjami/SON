@@ -54,6 +54,7 @@ class MyDsp : public AudioStream
     float puls[30];
     float paramC[30];
     float gains[30];
+    float Bw[30];
    
     
 };
