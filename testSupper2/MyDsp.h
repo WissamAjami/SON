@@ -51,7 +51,8 @@ class MyDsp : public AudioStream
     Filtre filtre29;
     Filtre filtre30;
     Filtre* filtres[30];
-    float freq[30];
+    float puls[30];
+    float paramC[30];
     float gains[30];
    
     
