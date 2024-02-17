@@ -35,8 +35,7 @@ void Filtre::wget(float x ){
     w1 = w;
 }
 
-float Filtre::tf2s(float x, float w1){
-    float c   = 1/tan(w1*0.5/SR);
+float Filtre::tf2s(float x, float wc, float c){
     float csq = c*c;
     float d   = a0 + a1 * c + csq;
     float b0d = (b0 + b1 * c + b2 * csq)/d;
@@ -49,31 +48,29 @@ float Filtre::tf2s(float x, float w1){
     return tf2(x);
 }
 
-float Filtre :: resonlp(float fc, int Q, int gain, float x){
-    float wc = 2*3.1415*fc;
+float Filtre :: resonlp(float wc,  float c, int Q, int gain, float x){
     setParam( gain, 0, 0,  1, 1.0/Q,  0);
-    return tf2s(x, wc);
+    return tf2s(x, wc, c);
 }
 
 
-float Filtre :: resonbp(float fc, int Q, int gain, float x){
-    float wc = 2*3.1415*fc;
+float Filtre :: resonbp(float wc, float c,  int Q, int gain, float x){
     setParam( 0,gain, 0, 1, 1.0/Q,  0);
-    return tf2s(x, wc);
+    return tf2s(x, wc, c);
 }
 
-float Filtre :: resonhp(float fc, int Q, int gain, float x){
-    float temp = resonlp(fc,Q,gain,x);
+float Filtre :: resonhp(float wc, float c, int Q, int gain, float x){
+    float temp = resonlp(wc,Q,gain,x,c );
     return gain*x - temp;
 }
 
 
-float Filtre::peak_eq(float Lfx, float fx, float B, float x){
-    float T = 1.0/SR;
-    float wx = 2*3.1415*fx;
-    float Bw = B*T/sin(wx*T); // prewarp s-bandwidth for more accuracy in z-plane
+float Filtre::peak_eq(float Lfx, float wx, float c, float Bw, float x){
+    //float T = 1.0/SR;
+    //float Bw_ = Bw*T/sin(wx*T); // prewarp s-bandwidth for more accuracy in z-plane
     float a_1 = 3.1415*Bw;
-    float g = pow(10,abs(Lfx)/10);
+    float g = pow(10,Lfx/10);
+    //float g = Lfx;
     float b_1 = g*a_1;
     float b1s, a1s;
     if(Lfx>0) {
@@ -84,5 +81,5 @@ float Filtre::peak_eq(float Lfx, float fx, float B, float x){
         a1s = b_1;
     }
     setParam(1, b1s,1, 1 ,a1s, 1);
-    return tf2s(x,wx);
+    return tf2s(x,wx,c);
 }

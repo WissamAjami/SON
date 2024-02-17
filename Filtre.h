@@ -6,10 +6,10 @@ class Filtre{
 public:
   Filtre(int samplingRate);
 
-  float resonlp(float fc, int Q, int gain, float x);
-  float resonbp(float fc, int Q, int gain, float x);
-  float resonhp(float fc, int Q, int gain, float x);
-  float peak_eq(float Lfx, float fx, float B, float x);
+  float resonlp(float wc, float c, int Q, int gain, float x);
+  float resonbp(float wc,float c, int Q, int gain, float x);
+  float resonhp(float wc, float c, int Q, int gain, float x);
+  float peak_eq(float Lfx, float wx, float c, float Bw , float x );
 
   
 private:
@@ -18,7 +18,7 @@ private:
     void setParam(float b0,float b1,float b2,float a0,float a1, float a2);
     float tf2(float x);
     void  wget(float x );
-    float tf2s(float x, float w1);
+    float tf2s(float x, float wc, float c);
 };
 
 #endif  //FILTRE_H_INCLUDED
